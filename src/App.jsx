@@ -1,7 +1,19 @@
-import { useState } from 'react'
+import { useState, createContext, useContext } from 'react'
 import { BrowserRouter as Router, Routes, Route, useParams, Link } from 'react-router-dom'
 import { sampleBooks } from './data/books'
 import './App.css'
+
+// Create context for managing books state
+const BooksContext = createContext();
+
+// Custom hook to use books context
+export const useBooks = () => {
+  const context = useContext(BooksContext);
+  if (!context) {
+    throw new Error('useBooks must be used within BooksProvider');
+  }
+  return context;
+};
 
 // Basic page components
 function HomePage() {
@@ -211,26 +223,55 @@ function NotFoundPage() {
 }
 
 function App() {
+  const [books, setBooks] = useState(sampleBooks);
+  
+  const addBook = (newBook) => {
+    const bookWithId = {
+      ...newBook,
+      id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1
+    };
+    setBooks(prevBooks => [...prevBooks, bookWithId]);
+  };
+  
+  const getBookById = (id) => {
+    return books.find(book => book.id === parseInt(id));
+  };
+  
+  const getBooksByCategory = (category) => {
+    if (category === 'All' || !category) return books;
+    return books.filter(book => book.category === category);
+  };
+  
+  const contextValue = {
+    books,
+    addBook,
+    getBookById,
+    getBooksByCategory,
+    categories: ['All', 'Fiction', 'Non-Fiction', 'Sci-Fi']
+  };
+  
   return (
-    <Router>
-      <div className="App">
-        <nav style={{ padding: '20px', backgroundColor: '#f0f0f0', marginBottom: '20px' }}>
-          <Link to="/" style={{ margin: '0 15px', textDecoration: 'none', color: '#333' }}>Home</Link>
-          <Link to="/browse" style={{ margin: '0 15px', textDecoration: 'none', color: '#333' }}>Browse Books</Link>
-          <Link to="/add" style={{ margin: '0 15px', textDecoration: 'none', color: '#333' }}>Add Book</Link>
-        </nav>
-        
-        <main style={{ padding: '20px' }}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/browse" element={<BrowsePage />} />
-            <Route path="/book/:id" element={<BookDetailsPage />} />
-            <Route path="/add" element={<AddBookPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+    <BooksContext.Provider value={contextValue}>
+      <Router>
+        <div className="App">
+          <nav style={{ padding: '20px', backgroundColor: '#f0f0f0', marginBottom: '20px' }}>
+            <Link to="/" style={{ margin: '0 15px', textDecoration: 'none', color: '#333' }}>Home</Link>
+            <Link to="/browse" style={{ margin: '0 15px', textDecoration: 'none', color: '#333' }}>Browse Books</Link>
+            <Link to="/add" style={{ margin: '0 15px', textDecoration: 'none', color: '#333' }}>Add Book</Link>
+          </nav>
+          
+          <main style={{ padding: '20px' }}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/browse" element={<BrowsePage />} />
+              <Route path="/book/:id" element={<BookDetailsPage />} />
+              <Route path="/add" element={<AddBookPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </BooksContext.Provider>
   )
 }
 
