@@ -17,6 +17,8 @@ export const useBooks = () => {
 
 // Basic page components
 function HomePage() {
+  const { books } = useBooks();
+  
   return (
     <div>
       <h1>Welcome to Online Library System</h1>
@@ -31,13 +33,23 @@ function HomePage() {
       
       <h2>Popular Books</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginTop: '20px' }}>
-        {sampleBooks.map(book => (
+        {books.slice(0, 6).map(book => (
           <div key={book.id} style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '5px' }}>
             <h3>{book.title}</h3>
             <p><strong>Author:</strong> {book.author}</p>
             <p><strong>Category:</strong> {book.category}</p>
             <p>{book.description}</p>
             <p><strong>Rating:</strong> {book.rating}/5</p>
+            <Link to={`/book/${book.id}`} style={{
+              display: 'inline-block',
+              marginTop: '10px',
+              padding: '6px 12px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '4px',
+              fontSize: '14px'
+            }}>View Details</Link>
           </div>
         ))}
       </div>
@@ -46,13 +58,13 @@ function HomePage() {
 }
 
 function BrowsePage() {
+  const { books, categories } = useBooks();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
-  const categories = ['All', 'Fiction', 'Non-Fiction', 'Sci-Fi'];
   
   let filteredBooks = selectedCategory === 'All' 
-    ? sampleBooks 
-    : sampleBooks.filter(book => book.category === selectedCategory);
+    ? books 
+    : books.filter(book => book.category === selectedCategory);
   
   // Apply search filter
   if (searchTerm) {
@@ -137,7 +149,8 @@ function BrowsePage() {
 
 function BookDetailsPage() {
   const { id } = useParams();
-  const book = sampleBooks.find(book => book.id === parseInt(id));
+  const { getBookById } = useBooks();
+  const book = getBookById(id);
   
   if (!book) {
     return (
