@@ -217,10 +217,208 @@ function BookDetailsPage() {
 }
 
 function AddBookPage() {
+  const { addBook, categories } = useBooks();
+  const [formData, setFormData] = useState({
+    title: '',
+    author: '',
+    category: '',
+    description: '',
+    rating: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+  
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
+    }
+    
+    if (!formData.author.trim()) {
+      newErrors.author = 'Author is required';
+    }
+    
+    if (!formData.category) {
+      newErrors.category = 'Category is required';
+    }
+    
+    if (!formData.description.trim()) {
+      newErrors.description = 'Description is required';
+    }
+    
+    if (!formData.rating) {
+      newErrors.rating = 'Rating is required';
+    } else if (isNaN(formData.rating) || formData.rating < 1 || formData.rating > 5) {
+      newErrors.rating = 'Rating must be a number between 1 and 5';
+    }
+    
+    return newErrors;
+  };
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formErrors = validateForm();
+    
+    if (Object.keys(formErrors).length === 0) {
+      const newBook = {
+        ...formData,
+        rating: parseFloat(formData.rating)
+      };
+      addBook(newBook);
+      setIsSubmitted(true);
+      setFormData({ title: '', author: '', category: '', description: '', rating: '' });
+    } else {
+      setErrors(formErrors);
+    }
+  };
+  
+  if (isSubmitted) {
+    return (
+      <div style={{ textAlign: 'center', padding: '40px' }}>
+        <h1 style={{ color: '#28a745' }}>Book Added Successfully!</h1>
+        <p>Your book has been added to the library.</p>
+        <Link to="/browse" style={{
+          display: 'inline-block',
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: '#007bff',
+          color: 'white',
+          textDecoration: 'none',
+          borderRadius: '5px'
+        }}>Browse All Books</Link>
+      </div>
+    );
+  }
+  
   return (
     <div>
       <h1>Add New Book</h1>
       <p>Add a book to our library collection</p>
+      
+      <form onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '20px 0' }}>
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Title:</label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleInputChange}
+            style={{
+              width: '100%',
+              padding: '8px',
+              fontSize: '16px',
+              border: errors.title ? '2px solid red' : '1px solid #ddd',
+              borderRadius: '4px'
+            }}
+          />
+          {errors.title && <span style={{ color: 'red', fontSize: '14px' }}>{errors.title}</span>}
+        </div>
+        
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Author:</label>
+          <input
+            type="text"
+            name="author"
+            value={formData.author}
+            onChange={handleInputChange}
+            style={{
+              width: '100%',
+              padding: '8px',
+              fontSize: '16px',
+              border: errors.author ? '2px solid red' : '1px solid #ddd',
+              borderRadius: '4px'
+            }}
+          />
+          {errors.author && <span style={{ color: 'red', fontSize: '14px' }}>{errors.author}</span>}
+        </div>
+        
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Category:</label>
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleInputChange}
+            style={{
+              width: '100%',
+              padding: '8px',
+              fontSize: '16px',
+              border: errors.category ? '2px solid red' : '1px solid #ddd',
+              borderRadius: '4px'
+            }}
+          >
+            <option value="">Select a category</option>
+            {categories.filter(cat => cat !== 'All').map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+          {errors.category && <span style={{ color: 'red', fontSize: '14px' }}>{errors.category}</span>}
+        </div>
+        
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description:</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            rows="4"
+            style={{
+              width: '100%',
+              padding: '8px',
+              fontSize: '16px',
+              border: errors.description ? '2px solid red' : '1px solid #ddd',
+              borderRadius: '4px',
+              resize: 'vertical'
+            }}
+          />
+          {errors.description && <span style={{ color: 'red', fontSize: '14px' }}>{errors.description}</span>}
+        </div>
+        
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Rating (1-5):</label>
+          <input
+            type="number"
+            name="rating"
+            value={formData.rating}
+            onChange={handleInputChange}
+            min="1"
+            max="5"
+            step="0.1"
+            style={{
+              width: '100%',
+              padding: '8px',
+              fontSize: '16px',
+              border: errors.rating ? '2px solid red' : '1px solid #ddd',
+              borderRadius: '4px'
+            }}
+          />
+          {errors.rating && <span style={{ color: 'red', fontSize: '14px' }}>{errors.rating}</span>}
+        </div>
+        
+        <button
+          type="submit"
+          style={{
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '12px 24px',
+            fontSize: '16px',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer'
+          }}
+        >
+          Add Book
+        </button>
+      </form>
     </div>
   )
 }
