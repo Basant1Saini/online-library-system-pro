@@ -35,16 +35,44 @@ function HomePage() {
 
 function BrowsePage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
   const categories = ['All', 'Fiction', 'Non-Fiction', 'Sci-Fi'];
   
-  const filteredBooks = selectedCategory === 'All' 
+  let filteredBooks = selectedCategory === 'All' 
     ? sampleBooks 
     : sampleBooks.filter(book => book.category === selectedCategory);
+  
+  // Apply search filter
+  if (searchTerm) {
+    filteredBooks = filteredBooks.filter(book => 
+      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
 
   return (
     <div>
       <h1>Browse Books</h1>
       <p>Find your favorite books here</p>
+      
+      {/* Search Bar */}
+      <div style={{ marginBottom: '20px' }}>
+        <h3>Search Books:</h3>
+        <input
+          type="text"
+          placeholder="Search by title or author..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            width: '100%',
+            maxWidth: '400px',
+            padding: '10px',
+            fontSize: '16px',
+            border: '1px solid #ddd',
+            borderRadius: '4px'
+          }}
+        />
+      </div>
       
       <div style={{ marginBottom: '20px' }}>
         <h3>Filter by Category:</h3>
