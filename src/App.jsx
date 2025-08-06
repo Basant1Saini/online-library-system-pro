@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { sampleBooks } from './data/books'
 import './App.css'
 
 // Basic page components
@@ -8,12 +9,26 @@ function HomePage() {
     <div>
       <h1>Welcome to Online Library System</h1>
       <p>Your digital library management system</p>
+      
       <h2>Book Categories</h2>
       <ul>
         <li>Fiction</li>
         <li>Non-Fiction</li>
         <li>Sci-Fi</li>
       </ul>
+      
+      <h2>Popular Books</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginTop: '20px' }}>
+        {sampleBooks.map(book => (
+          <div key={book.id} style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '5px' }}>
+            <h3>{book.title}</h3>
+            <p><strong>Author:</strong> {book.author}</p>
+            <p><strong>Category:</strong> {book.category}</p>
+            <p>{book.description}</p>
+            <p><strong>Rating:</strong> {book.rating}/5</p>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
