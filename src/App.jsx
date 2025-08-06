@@ -215,9 +215,9 @@ function App() {
     <Router>
       <div className="App">
         <nav style={{ padding: '20px', backgroundColor: '#f0f0f0', marginBottom: '20px' }}>
-          <a href="/" style={{ margin: '0 15px' }}>Home</a>
-          <a href="/browse" style={{ margin: '0 15px' }}>Browse Books</a>
-          <a href="/add" style={{ margin: '0 15px' }}>Add Book</a>
+          <Link to="/" style={{ margin: '0 15px', textDecoration: 'none', color: '#333' }}>Home</Link>
+          <Link to="/browse" style={{ margin: '0 15px', textDecoration: 'none', color: '#333' }}>Browse Books</Link>
+          <Link to="/add" style={{ margin: '0 15px', textDecoration: 'none', color: '#333' }}>Add Book</Link>
         </nav>
         
         <main style={{ padding: '20px' }}>
