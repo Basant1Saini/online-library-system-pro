@@ -34,10 +34,60 @@ function HomePage() {
 }
 
 function BrowsePage() {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const categories = ['All', 'Fiction', 'Non-Fiction', 'Sci-Fi'];
+  
+  const filteredBooks = selectedCategory === 'All' 
+    ? sampleBooks 
+    : sampleBooks.filter(book => book.category === selectedCategory);
+
   return (
     <div>
       <h1>Browse Books</h1>
       <p>Find your favorite books here</p>
+      
+      <div style={{ marginBottom: '20px' }}>
+        <h3>Filter by Category:</h3>
+        {categories.map(category => (
+          <button 
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            style={{
+              margin: '5px',
+              padding: '8px 16px',
+              backgroundColor: selectedCategory === category ? '#007bff' : '#f8f9fa',
+              color: selectedCategory === category ? 'white' : 'black',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+        {filteredBooks.map(book => (
+          <div key={book.id} style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '5px' }}>
+            <h3>{book.title}</h3>
+            <p><strong>Author:</strong> {book.author}</p>
+            <p><strong>Category:</strong> {book.category}</p>
+            <p>{book.description}</p>
+            <p><strong>Rating:</strong> {book.rating}/5</p>
+            <button style={{ 
+              backgroundColor: '#28a745', 
+              color: 'white', 
+              border: 'none', 
+              padding: '8px 12px', 
+              borderRadius: '4px', 
+              cursor: 'pointer' 
+            }}>
+              View Details
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
