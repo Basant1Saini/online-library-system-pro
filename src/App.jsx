@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useParams, Link } from 'react-router-dom'
 import { sampleBooks } from './data/books'
 import './App.css'
 
@@ -103,21 +103,92 @@ function BrowsePage() {
             <p><strong>Category:</strong> {book.category}</p>
             <p>{book.description}</p>
             <p><strong>Rating:</strong> {book.rating}/5</p>
-            <button style={{ 
-              backgroundColor: '#28a745', 
-              color: 'white', 
-              border: 'none', 
-              padding: '8px 12px', 
-              borderRadius: '4px', 
-              cursor: 'pointer' 
-            }}>
-              View Details
-            </button>
+            <Link to={`/book/${book.id}`}>
+              <button style={{ 
+                backgroundColor: '#28a745', 
+                color: 'white', 
+                border: 'none', 
+                padding: '8px 12px', 
+                borderRadius: '4px', 
+                cursor: 'pointer',
+                textDecoration: 'none'
+              }}>
+                View Details
+              </button>
+            </Link>
           </div>
         ))}
       </div>
     </div>
   )
+}
+
+function BookDetailsPage() {
+  const { id } = useParams();
+  const book = sampleBooks.find(book => book.id === parseInt(id));
+  
+  if (!book) {
+    return (
+      <div>
+        <h1>Book Not Found</h1>
+        <p>The book you're looking for doesn't exist.</p>
+        <Link to="/browse">Back to Browse Books</Link>
+      </div>
+    );
+  }
+  
+  return (
+    <div>
+      <div style={{ marginBottom: '20px' }}>
+        <Link to="/browse" style={{ 
+          color: '#007bff', 
+          textDecoration: 'none',
+          fontSize: '16px'
+        }}>← Back to Browse</Link>
+      </div>
+      
+      <div style={{ 
+        maxWidth: '600px', 
+        margin: '0 auto',
+        border: '1px solid #ddd',
+        borderRadius: '8px',
+        padding: '30px'
+      }}>
+        <h1 style={{ color: '#333', marginBottom: '10px' }}>{book.title}</h1>
+        <p style={{ fontSize: '18px', color: '#666', marginBottom: '20px' }}>by {book.author}</p>
+        
+        <div style={{ marginBottom: '15px' }}>
+          <span style={{
+            backgroundColor: book.category === 'Fiction' ? '#e3f2fd' : 
+                          book.category === 'Non-Fiction' ? '#f3e5f5' : '#e8f5e8',
+            color: book.category === 'Fiction' ? '#1976d2' : 
+                   book.category === 'Non-Fiction' ? '#7b1fa2' : '#388e3c',
+            padding: '5px 12px',
+            borderRadius: '15px',
+            fontSize: '14px',
+            fontWeight: 'bold'
+          }}>
+            {book.category}
+          </span>
+        </div>
+        
+        <div style={{ marginBottom: '20px' }}>
+          <p style={{ fontSize: '18px', marginBottom: '5px' }}>
+            <strong>Rating: </strong>
+            <span style={{ color: '#ff9800', fontSize: '20px' }}>★</span>
+            <span style={{ marginLeft: '5px', fontSize: '18px' }}>{book.rating}/5</span>
+          </p>
+        </div>
+        
+        <div>
+          <h3 style={{ marginBottom: '10px' }}>Description</h3>
+          <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#555' }}>
+            {book.description}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function AddBookPage() {
@@ -153,6 +224,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/browse" element={<BrowsePage />} />
+            <Route path="/book/:id" element={<BookDetailsPage />} />
             <Route path="/add" element={<AddBookPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
